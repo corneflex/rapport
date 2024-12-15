@@ -2,9 +2,16 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getReports } from '@/services/reports';
-import { FileText, Clock } from 'lucide-react';
+import { FileText, Clock, PlusCircle } from 'lucide-react';
+import { headers } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function Home() {
+  // Forcer la revalidation en utilisant un timestamp
+  headers();
+  
   const reports = await getReports();
 
   return (
@@ -17,6 +24,7 @@ export default async function Home() {
               href="/reports/new"
               className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
+              <PlusCircle className="h-4 w-4 mr-2" />
               Nouveau Rapport
             </Link>
           </div>
@@ -27,19 +35,19 @@ export default async function Home() {
                 <Link
                   key={report.id}
                   href={`/reports/${report.id}`}
-                  className="group"
+                  className="block group"
                 >
                   <article className="h-full bg-card text-card-foreground rounded-lg border shadow-sm hover:shadow-md transition-all duration-200 p-6 flex flex-col">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-2">
                         <FileText className="h-5 w-5 text-primary" />
-                        <h2 className="text-xl font-semibold group-hover:text-primary transition-colors">
+                        <h2 className="text-xl font-semibold group-hover:text-primary transition-colors line-clamp-2">
                           {report.title}
                         </h2>
                       </div>
                     </div>
                     <div className="mt-auto flex items-center text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 mr-2" />
+                      <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span>
                         {formatDistanceToNow(new Date(report.updatedAt), {
                           addSuffix: true,
@@ -65,6 +73,7 @@ export default async function Home() {
                   href="/reports/new"
                   className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
+                  <PlusCircle className="h-4 w-4 mr-2" />
                   Créer mon premier rapport
                 </Link>
               </div>
