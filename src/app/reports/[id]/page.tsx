@@ -6,9 +6,7 @@ import { notFound } from 'next/navigation';
 import { ReportTheme, ReportTitle, ReportContent, ThemeType } from '@/components/ReportTheme';
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 async function getReport(id: string) {
@@ -26,7 +24,8 @@ async function getReport(id: string) {
 }
 
 export default async function ReportPage({ params }: PageProps) {
-  const report = await getReport(params.id);
+  const resolvedParams = await params;
+  const report = await getReport(resolvedParams.id);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">

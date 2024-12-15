@@ -6,9 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ThemeType } from '@/components/ReportTheme';
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 const themes = [
@@ -25,11 +23,14 @@ export default function EditReport({ params }: PageProps) {
   const [theme, setTheme] = useState<ThemeType>('modern');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reportId, setReportId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchReport = async () => {
+    const initReport = async () => {
       try {
-        const response = await fetch(`/api/reports/${params.id}`);
+        const resolvedParams = await params;
+        setReportId(resolvedParams.id);
+        const response = await fetch(`/api/reports/${resolvedParams.id}`);
         if (!response.ok) throw new Error('Failed to fetch report');
         const report = await response.json();
         setTitle(report.title);
@@ -43,15 +44,16 @@ export default function EditReport({ params }: PageProps) {
       }
     };
 
-    fetchReport();
-  }, [params.id]);
+    initReport();
+  }, [params]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!reportId) return;
     
+    setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/reports/${params.id}`, {
+      const response = await fetch(`/api/reports/${reportId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +65,7 @@ export default function EditReport({ params }: PageProps) {
         throw new Error('Failed to update report');
       }
 
-      router.push(`/reports/${params.id}`);
+      router.push(`/reports/${reportId}`);
       router.refresh();
     } catch (error) {
       console.error('Error updating report:', error);
