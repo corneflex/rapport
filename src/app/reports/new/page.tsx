@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Editor from '@/components/Editor';
 import { useRouter } from 'next/navigation';
+import Editor from '@/components/Editor';
 import { ThemeType } from '@/components/ReportTheme';
 
 const themes = [
@@ -22,7 +22,7 @@ export default function NewReport() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('/api/reports', {
         method: 'POST',
@@ -36,7 +36,8 @@ export default function NewReport() {
         throw new Error('Failed to create report');
       }
 
-      router.push('/');
+      const report = await response.json();
+      router.push(`/reports/${report.id}`);
       router.refresh();
     } catch (error) {
       console.error('Error creating report:', error);
@@ -58,7 +59,7 @@ export default function NewReport() {
                 disabled={isSubmitting}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+                {isSubmitting ? 'Création...' : 'Créer'}
               </button>
               <button
                 type="button"

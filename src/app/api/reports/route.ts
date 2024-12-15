@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { createReport, getReports } from '@/services/reports';
 
 export async function GET() {
   try {
-    const reports = await prisma.report.findMany({
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
+    const reports = await getReports();
     return NextResponse.json(reports);
-  } catch {
+  } catch (error) {
+    console.error('Error fetching reports:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
@@ -17,15 +14,14 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const report = await prisma.report.create({
-      data: {
-        title: body.title,
-        content: body.content,
-        theme: body.theme,
-      },
+    const report = await createReport({
+      title: body.title,
+      content: body.content,
+      theme: body.theme,
     });
     return NextResponse.json(report);
-  } catch {
+  } catch (error) {
+    console.error('Error creating report:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
